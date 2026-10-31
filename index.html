@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teen Chore & Points Tracker</title>
+  
+  <!-- React & ReactDOM CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Babel for JSX compilation in browser -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    html, body, #root {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Conversion Constant: 20 Points = £10.00 (1 Point = £0.50)
+    const CASH_PER_POINT = 0.50;
+
+    // Default Initial Data
+    const INITIAL_TEENS = [
+      { 
+        id: '1', 
+        name: 'Christopher', 
+        avatar: '🎼', 
+        points: 0, 
+        level: 1, 
+        streak: 0, 
+        goalAmount: 50.00,
+        image: 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D'
+      },
+      { 
+        id: '2', 
+        name: 'Callum', 
+        avatar: '🕺', 
+        points: 0, 
+        level: 1, 
+        streak: 0,
+        goalAmount: 50.00,
+        image:  'https://images.unsplash.com/photo-1604586376807-f73185cf5867?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D'
+      }
+    ];
+
+    const INITIAL_CHORES = [
+      { id: 'c1', title: 'Clean Kitchen & Surfaces', category: 'Cleaning', points: 1, frequency: 'Daily', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c2', title: 'Wash & Dry all Dishes', category: 'Cleaning', points: 1, frequency: 'Daily', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c3', title: 'Empty all 4 Bins', category: 'Cleaning', points: 1, frequency: 'As Required', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c4', title: 'Empty & Fill the Dishwasher', category: 'Cleaning', points: 1, frequency: 'Daily', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c5', title: 'Vacuum Downstairs', category: 'Cleaning', points: 1, frequency: 'Bi-Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c6', title: 'Vacuum Upstairs', category: 'Cleaning', points: 1, frequency: 'Bi-Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c7', title: 'Vacuum the Stairs', category: 'Cleaning', points: 1, frequency: 'Bi-Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c8', title: 'Tidy & Dust the Living Room', category: 'Cleaning', points: 1, frequency: 'Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c9', title: 'Clean Downstairs Toilet', category: 'Cleaning', points: 1, frequency: 'Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c10', title: 'Clean the Shower Room', category: 'Cleaning', points: 1, frequency: 'Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c11', title: 'Clean Upstairs Bathroom', category: 'Cleaning', points: 1, frequency: 'Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c12', title: 'Dust Full Bedroom', category: 'Cleaning', points: 2, frequency: 'Monthly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c13', title: 'Put on a Washing', category: 'Cleaning', points: 1, frequency: 'When Required', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c14', title: 'Hang up Washing', category: 'Cleaning', points: 1, frequency: 'When Required', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c15', title: 'Dust the Loft', category: 'Cleaning', points: 3, frequency: 'Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c16', title: 'Dust all Picture Frames', category: 'Cleaning', points: 1, frequency: 'Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c17', title: 'Clean Downstairs Mirrors', category: 'Cleaning', points: 1, frequency: 'Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c18', title: 'Clean Kitchen/Dining Floor', category: 'Cleaning', points: 2, frequency: 'Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c19', title: 'Clean Hall Floor', category: 'Cleaning', points: 2, frequency: 'Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c20', title: 'Dust Bannister and Edges', category: 'Cleaning', points: 1, frequency: 'Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c21', title: 'Dust all Skirting Boards', category: 'Cleaning', points: 1, frequency: 'Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c22', title: 'Wash Mum's Car', category: 'Cleaning', points: 5, frequency: 'Monthly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c23', title: 'Wash Dad's Car', category: 'Cleaning', points: 5, frequency: 'Monthly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c24', title: 'Clean Inside Mum's Car', category: 'Cleaning', points: 5, frequency: 'Monthly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c25', title: 'Clean Inside Dad's Car', category: 'Cleaning', points: 5, frequency: 'Monthly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c26', title: 'Clean Windows - Inside', category: 'Cleaning', points: 2, frequency: 'Weekly', assignedTo: 'all', priority: 'High', status: 'Available' },
+      { id: 'c27', title: 'Miscellaneous', category: 'Cleaning', points: 1, frequency: 'When Required', assignedTo: 'all', priority: 'High', status: 'Available' },
+    ];
+
+    function App() {
+      // LocalStorage Persistence
+      const [teens, setTeens] = useState(() => {
+        const saved = localStorage.getItem('teen_chores_teens_pts');
+        return saved ? JSON.parse(saved) : INITIAL_TEENS;
+      });
+
+      const [chores, setChores] = useState(() => {
+        const saved = localStorage.getItem('teen_chores_list_pts');
+        return saved ? JSON.parse(saved) : INITIAL_CHORES;
+      });
+
+      const [activeTeenId, setActiveTeenId] = useState(() => teens[0]?.id || '1');
+      const [activeTab, setActiveTab] = useState('dashboard');
+      const [isAdmin, setIsAdmin] = useState(false);
+      const [pinInput, setPinInput] = useState('');
+      const [pinError, setPinError] = useState('');
+      
+      // CHANGE PARENT PORTAL PIN HERE IF DESIRED (Default: '1236')
+      const [parentPin, setParentPin] = useState('1236');
+
+      // New Chore Form State
+      const [newChore, setNewChore] = useState({
+        title: '', category: 'Cleaning', points: '6', frequency: 'Daily', assignedTo: 'all', priority: 'Medium'
+      });
+
+      useEffect(() => {
+        localStorage.setItem('teen_chores_teens_pts', JSON.stringify(teens));
+      }, [teens]);
+
+      useEffect(() => {
+        localStorage.setItem('teen_chores_list_pts', JSON.stringify(chores));
+      }, [chores]);
+
+      const activeTeen = teens.find(t => t.id === activeTeenId) || teens[0];
+
+      // Handle Claim / Complete Chore
+      const handleCompleteChore = (choreId) => {
+        setChores(prev => prev.map(c => c.id === choreId ? { ...c, status: 'Pending Approval', completedBy: activeTeenId } : c));
+      };
+
+      // Admin Approve Chore
+      const handleApproveChore = (choreId) => {
+        const chore = chores.find(c => c.id === choreId);
+        if (!chore) return;
+
+        const completerId = chore.completedBy || activeTeenId;
+
+        setTeens(prev => prev.map(t => {
+          if (t.id === completerId) {
+            const newPoints = t.points + chore.points;
+            const newLevel = Math.floor(newPoints / 20) + 1;
+            return {
+              ...t,
+              points: newPoints,
+              level: newLevel,
+              streak: t.streak + 1
+            };
+          }
+          return t;
+        }));
+
+        setChores(prev => prev.map(c => c.id === choreId ? { ...c, status: 'Completed' } : c));
+      };
+
+      // Admin Delete Chore Function
+      const handleDeleteChore = (choreId) => {
+        setChores(prev => prev.filter(c => c.id !== choreId));
+      };
+
+      // Admin Reset / Payout Points
+      // Option A: Deduct spent points
+      const handleDeductPoints = (teenId, pointsToDeduct) => {
+        const pts = parseInt(pointsToDeduct);
+        if (isNaN(pts) || pts <= 0) return;
+
+        setTeens(prev => prev.map(t => {
+          if (t.id === teenId) {
+            const updatedPoints = Math.max(0, t.points - pts);
+            return { ...t, points: updatedPoints };
+          }
+          return t;
+        }));
+      };
+
+      // Option B: Set a direct new total
+      const handleSetPoints = (teenId, newTotalPoints) => {
+        const pts = parseInt(newTotalPoints);
+        if (isNaN(pts) || pts < 0) return;
+
+        setTeens(prev => prev.map(t => {
+          if (t.id === teenId) {
+            return { ...t, points: pts };
+          }
+          return t;
+        }));
+      };
+
+      // Add New Chore
+      const handleAddChore = (e) => {
+        e.preventDefault();
+        if (!newChore.title.trim()) return;
+
+        const created = {
+          id: 'c_' + Date.now(),
+          title: newChore.title,
+          category: newChore.category,
+          points: parseInt(newChore.points) || 1,
+          frequency: newChore.frequency,
+          assignedTo: newChore.assignedTo,
+          priority: newChore.priority,
+          status: 'Available'
+        };
+
+        setChores(prev => [created, ...prev]);
+        setNewChore({ title: '', category: 'Cleaning', points: '6', frequency: 'Daily', assignedTo: 'all', priority: 'Medium' });
+      };
+
+      // Handle Admin PIN Unlock
+      const handlePinSubmit = (e) => {
+        e.preventDefault();
+        if (pinInput === parentPin) {
+          setIsAdmin(true);
+          setPinError('');
+          setPinInput('');
+        } else {
+          setPinError(`Incorrect PIN. Default is ${parentPin}`);
+        }
+      };
+
+      // Helper cash converter
+      const pointsToCash = (pts) => (pts * CASH_PER_POINT).toFixed(2);
+
+      return (
+        <div className="min-h-screen w-full flex flex-col bg-slate-950 text-slate-100">
+          
+          {/* Top Header */}
+          <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-xl shadow-lg shadow-indigo-500/30">
+                💷
+              </div>
+              <div>
+                <h1 className="font-bold text-xl leading-tight text-slate-100">ChoreTracker</h1>
+                <p className="text-xs text-slate-400">Chores & Reward Points</p>
+              </div>
+            </div>
+
+            {/* Profile Switcher */}
+            <div className="flex items-center gap-3 bg-slate-800/70 p-1.5 rounded-xl border border-slate-700">
+              <span className="text-xs text-slate-400 pl-2 hidden sm:inline">Profile:</span>
+              {teens.map(teen => (
+                <button
+                  key={teen.id}
+                  onClick={() => setActiveTeenId(teen.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                    activeTeenId === teen.id 
+                      ? 'bg-indigo-600 text-white shadow-md' 
+                      : 'text-slate-300 hover:bg-slate-700/50'
+                  }`}
+                >
+                  <span>{teen.avatar}</span>
+                  <span>{teen.name}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Parent Admin Toggle */}
+            <div>
+              {isAdmin ? (
+                <button 
+                  onClick={() => setIsAdmin(false)}
+                  className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-medium hover:bg-emerald-500/30 transition-all"
+                >
+                  🔒 Exit Admin
+                </button>
+              ) : (
+                <button 
+                  onClick={() => setActiveTab('admin')}
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-lg text-xs font-medium transition-all"
+                >
+                  🔐 Parent Portal
+                </button>
+              )}
+            </div>
+          </header>
+
+          {/* Navigation Tabs */}
+          <nav className="border-b border-slate-800 bg-slate-900/40 px-6 flex items-center gap-2 overflow-x-auto">
+            {[
+              { id: 'dashboard', label: 'Overview', icon: '📊' },
+              { id: 'chores', label: 'Chore Board', icon: '📋' },
+              { id: 'converter', label: 'Points & Value', icon: '💷' },
+              { id: 'admin', label: isAdmin ? 'Admin Controls' : 'Parent Portal', icon: '🔐' }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`py-3 px-4 text-sm font-medium border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? 'border-indigo-500 text-indigo-400 bg-indigo-500/5'
+                    : 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                }`}
+              >
+                <span>{tab.icon}</span>
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </nav>
+
+          {/* Main Body with Background Image Overlay */}
+          <main 
+            className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6 relative rounded-2xl overflow-hidden transition-all duration-500"
+            style={{
+              backgroundImage: activeTeen?.image ? `linear-gradient(to bottom, rgba(15, 23, 42, 0.50), rgba(15, 23, 42, 0.65)), url(${activeTeen.image})` : 'none',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+
+            {/* Conversion Banner */}
+            <div className="bg-indigo-950/60 backdrop-blur-md border border-indigo-800/50 p-4 rounded-xl flex flex-wrap items-center justify-between gap-3 text-sm">
+              <div className="flex items-center gap-2 text-indigo-300">
+                <span className="text-base">💡</span>
+                <span className="font-medium	">Point Value Rate:</span>
+                <span className="font-bold text-white bg-indigo-900/80 px-2 py-0.5 rounded border border-indigo-700">20 Points = £10.00</span>
+                <span className="text-slate-400">(1 Point = £0.50)</span>
+              </div>
+              <div className="text-slate-300">
+                {activeTeen.name} currently has <span className="font-bold text-amber-400">{activeTeen.points} Points</span>
+              </div>
+            </div>
+
+            {/* TAB 1: DASHBOARD OVERVIEW */}
+            {activeTab === 'dashboard' && (
+              <div className="space-y-6">
+                
+                {/* Stats Cards Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 p-5 rounded-2xl">
+                    <div className="text-xs font-medium text-slate-400">Total Points Earned</div>
+                    <div className="text-3xl font-extrabold text-amber-400 mt-2">{activeTeen.points} Pts</div>
+                    <div className="text-xs text-slate-500 mt-1">Ready for redemption</div>
+                  </div>
+
+                  <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 p-5 rounded-2xl">
+                    <div className="text-xs font-medium text-slate-400">Cash Value Equivalent</div>
+                    <div className="text-3xl font-extrabold text-emerald-400 mt-2">£{pointsToCash(activeTeen.points)}</div>
+                    <div className="text-xs text-slate-500 mt-1">Based on 20 pts = £10</div>
+                  </div>
+
+                  <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 p-5 rounded-2xl">
+                    <div className="text-xs font-medium text-slate-400">Current Level</div>
+                    <div className="text-3xl font-extrabold text-indigo-400 mt-2">Level {activeTeen.level}</div>
+                    <div className="text-xs text-slate-500 mt-1">{activeTeen.streak} Day streak 🔥</div>
+                  </div>
+
+                  <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 p-5 rounded-2xl">
+                    <div className="text-xs font-medium text-slate-400">Goal: {activeTeen.goal}</div>
+                    <div className="text-xl font-bold text-slate-200 mt-2">
+                      £{pointsToCash(activeTeen.points)} / £{activeTeen.goalAmount.toFixed(2)}
+                    </div>
+                    {/* Goal Progress Bar */}
+                    <div className="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
+                      <div 
+                        className="bg-indigo-500 h-full rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(100, (parseFloat(pointsToCash(activeTeen.points)) / activeTeen.goalAmount) * 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Available Chores */}
+                <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-6">
+                  <h2 className="text-lg font-bold text-slate-100 mb-4 flex items-center gap-2">
+                    <span>📋 Ready Chores</span>
+                  </h2>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {chores.filter(c => c.status === 'Available' && (c.assignedTo === 'all' || c.assignedTo === activeTeen.id)).map(chore => (
+                      <div key={chore.id} className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-slate-200">{chore.title}</span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400">{chore.category}</span>
+                          </div>
+                          <div className="text-xs text-slate-400 flex items-center gap-3">
+                            <span className="text-amber-400 font-bold">{chore.points} Points</span>
+                            <span>•</span>
+                            <span>{chore.frequency}</span>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => handleCompleteChore(chore.id)}
+                          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow-md transition-all whitespace-nowrap"
+                        >
+                          Mark Done
+                        </button>
+                      </div>
+                    ))}
+                    {chores.filter(c => c.status === 'Available' && (c.assignedTo === 'all' || c.assignedTo === activeTeen.id)).length === 0 && (
+                      <p className="text-xs text-slate-400 col-span-2">No chores currently available.</p>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            )}
+
+            {/* TAB 2: CHORE BOARD */}
+            {activeTab === 'chores' && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-slate-100">All Master Chores</h2>
+                  <span className="text-xs text-slate-400">All chores show point values only</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {chores.map(chore => (
+                    <div key={chore.id} className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between">
+                          <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">{chore.category}</span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                            chore.status === 'Completed' ? 'bg-emerald-500/20 text-emerald-400' :
+                            chore.status === 'Pending Approval' ? 'bg-amber-500/20 text-amber-400' :
+                            'bg-slate-800 text-slate-300'
+                          }`}>
+                            {chore.status}
+                          </span>
+                        </div>
+
+                        <h3 className="font-bold text-slate-100 text-base">{chore.title}</h3>
+                        <p className="text-xs text-slate-400">Priority: {chore.priority} | Schedule: {chore.frequency}</p>
+                      </div>
+
+                      <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                        <div>
+                          <span className="text-lg font-extrabold text-amber-400">{chore.points} Points</span>
+                        </div>
+
+                        {chore.status === 'Available' && (
+                          <button
+                            onClick={() => handleCompleteChore(chore.id)}
+                            className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition-all"
+                          >
+                            Claim Points
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: CALENDAR (FULL CURRENT MONTH) */}
+            {activeTab === 'calendar' && (() => {
+              const now = new Date();
+              const currentYear = now.getFullYear();
+              const currentMonthIndex = now.getMonth();
+              const todayDate = now.getDate();
+
+              const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+              ];
+
+              const daysInMonth = new Date(currentYear, currentMonthIndex + 1, 0).getDate();
+              const firstDayRaw = new Date(currentYear, currentMonthIndex, 1).getDay();
+              const startOffset = (firstDayRaw + 6) % 7;
+
+              const daysArray = [];
+              for (let i = 0; i < startOffset; i++) {
+                daysArray.push({ type: 'empty', id: `emp-${i}` });
+              }
+              for (let d = 1; d <= daysInMonth; d++) {
+                daysArray.push({ type: 'day', dayNumber: d, id: `day-${d}` });
+              }
+
+              return (
+                <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-6 space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div>
+                      <h2 className="text-xl font-bold text-slate-100">
+                        {monthNames[currentMonthIndex]} {currentYear}
+                      </h2>
+                      <p className="text-xs text-slate-400">Monthly chore schedule overview</p>
+                    </div>
+                    <div className="text-xs px-3 py-1.5 bg-indigo-950 text-indigo-300 border border-indigo-800/60 rounded-lg font-semibold">
+                      Today: {todayDate} {monthNames[currentMonthIndex]}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-400 uppercase tracking-wider py-1">
+                    <div>Mon</div>
+                    <div>Tue</div>
+                    <div>Wed</div>
+                    <div>Thu</div>
+                    <div>Fri</div>
+                    <div>Sat</div>
+                    <div>Sun</div>
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-2">
+                    {daysArray.map((cell) => {
+                      if (cell.type === 'empty') {
+                        return (
+                          <div key={cell.id} className="bg-slate-950/30 border border-slate-900/40 rounded-xl min-h-[85px] p-2" />
+                        );
+                      }
+
+                      const isToday = cell.dayNumber === todayDate;
+
+                      return (
+                        <div
+                          key={cell.id}
+                          className={`bg-slate-950/80 border rounded-xl min-h-[85px] p-2 space-y-1 transition-all ${
+                            isToday
+                              ? 'border-indigo-500 ring-1 ring-indigo-500 bg-indigo-950/40'
+                              : 'border-slate-800/80 hover:border-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className={`text-xs font-bold ${isToday ? 'text-indigo-400 font-extrabold' : 'text-slate-400'}`}>
+                              {cell.dayNumber}
+                            </span>
+                            {isToday && (
+                              <span className="text-[9px] bg-indigo-600 text-white px-1.5 py-0.5 rounded font-bold">
+                                Today
+                              </span>
+                            )}
+                          </div>
+
+                          {cell.dayNumber % 4 === 0 ? (
+                            <div className="bg-indigo-950/70 border border-indigo-800/40 p-1.5 rounded text-[10px]">
+                              <div className="font-semibold text-indigo-200 truncate">Clean Kitchen</div>
+                              <div className="text-amber-400 font-bold">8 Pts</div>
+                            </div>
+                          ) : cell.dayNumber % 7 === 0 ? (
+                            <div className="bg-emerald-950/70 border border-emerald-800/40 p-1.5 rounded text-[10px]">
+                              <div className="font-semibold text-emerald-200 truncate">Mow Lawn</div>
+                              <div className="text-amber-400 font-bold">14 Pts</div>
+                            </div>
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* TAB 4: POINTS TO CASH CONVERTER */}
+            {activeTab === 'converter' && (
+              <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-6 space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-100">Points & Cash Value Breakdown</h2>
+                    <p className="text-xs text-slate-400">See how accumulated chore points convert to cash</p>
+                  </div>
+
+                  <div className="text-right">
+                    <div className="text-3xl font-extrabold text-amber-400">{activeTeen.points} Points</div>
+                    <div className="text-xs text-emerald-400 font-bold mt-0.5">= £{pointsToCash(activeTeen.points)} Cash Value</div>
+                  </div>
+                </div>
+
+                <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-5 space-y-4">
+                  <h3 className="font-bold text-base text-slate-200">Point Conversion Guide</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-base">
+                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-800">
+                      <div className="text-slate-400">2 Points</div>
+                      <div className="text-emerald-400 font-bold mt-1">£1.00</div>
+                    </div>
+                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-800">
+                      <div className="text-slate-400">10 Points</div>
+                      <div className="text-emerald-400 font-bold mt-1">£5.00</div>
+                    </div>
+                    <div className="bg-indigo-950 border border-indigo-800/60 p-3 rounded-lg">
+                      <div className="text-indigo-300 font-bold">20 Points</div>
+                      <div className="text-emerald-400 font-extrabold text-sm mt-1">£10.00</div>
+                    </div>
+                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-800">
+                      <div className="text-slate-400">2 Points</div>
+                      <div className="text-emerald-400 font-bold mt-1">1 Hour of XBOX</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border border-slate-800 rounded-xl overflow-hidden">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-950 text-slate-400 uppercase font-semibold border-b border-slate-800">
+                      <tr>
+                        <th className="p-3">Completed Task</th>
+                        <th className="p-3">Category</th>
+                        <th className="p-3 text-right">Points Earned</th>
+                        <th className="p-3 text-right">Cash Value</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                      {chores.filter(c => c.status === 'Completed').map(chore => (
+                        <tr key={chore.id} className="hover:bg-slate-800/30">
+                          <td className="p-3 font-medium text-slate-100">{chore.title}</td>
+                          <td className="p-3">{chore.category}</td>
+                          <td className="p-3 text-right font-bold text-amber-400">+{chore.points} Pts</td>
+                          <td className="p-3 text-right font-bold text-emerald-400">£{pointsToCash(chore.points)}</td>
+                        </tr>
+                      ))}
+                      {chores.filter(c => c.status === 'Completed').length === 0 && (
+                        <tr>
+                          <td colSpan="4" className="p-4 text-center text-slate-500">No completed tasks yet.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 5: PARENT ADMIN PORTAL */}
+            {activeTab === 'admin' && (
+              <div className="space-y-6">
+                {!isAdmin ? (
+                  <div className="max-w-md mx-auto bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-8 space-y-6 text-center">
+                    <div className="w-12 h-12 rounded-full bg-indigo-600/20 text-indigo-400 flex items-center justify-center mx-auto text-xl">
+                      🔐
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-slate-100">Parent Access Lock</h2>
+                      <p className="text-xs text-slate-400 mt-1">Enter your 4-digit PIN (Default: 1236)</p>
+                    </div>
+
+                    <form onSubmit={handlePinSubmit} className="space-y-4">
+                      <input
+                        type="password"
+                        maxLength="4"
+                        placeholder="••••"
+                        value={pinInput}
+                        onChange={(e) => setPinInput(e.target.value)}
+                        className="w-full text-center text-2xl tracking-widest bg-slate-950 border border-slate-800 rounded-xl py-3 text-slate-100 focus:outline-none focus:border-indigo-500"
+                      />
+
+                      {pinError && <p className="text-xs text-rose-400 font-medium">{pinError}</p>}
+
+                      <button
+                        type="submit"
+                        className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-semibold transition-all shadow-lg"
+                      >
+                        Unlock Parent Controls
+                      </button>
+                    </form>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    
+                    {/* Awaiting Approval Section */}
+                    <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-6 space-y-4">
+                      <h2 className="text-lg font-bold text-slate-100">⏳ Chores Awaiting Approval</h2>
+
+                      <div className="space-y-3">
+                        {chores.filter(c => c.status === 'Pending Approval').map(chore => (
+                          <div key={chore.id} className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                            <div>
+                              <div className="font-bold text-slate-200">{chore.title}</div>
+                              <div className="text-xs text-amber-400 font-semibold mt-0.5">Reward: {chore.points} Points (£{pointsToCash(chore.points)})</div>
+                            </div>
+                            <button
+                              onClick={() => handleApproveChore(chore.id)}
+                              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold shadow-md transition-all"
+                            >
+                              Approve Points
+                            </button>
+                          </div>
+                        ))}
+                        {chores.filter(c => c.status === 'Pending Approval').length === 0 && (
+                          <p className="text-xs text-slate-500">No chores pending approval.</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Add New Chore */}
+                    <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-6 space-y-4">
+                      <h2 className="text-lg font-bold text-slate-100">Create Point-Based Chore</h2>
+
+                      <form onSubmit={handleAddChore} className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                        <div className="space-y-1 md:col-span-2">
+                          <label className="text-slate-400">Chore Title</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Wash & Vacuum Family Car"
+                            value={newChore.title}
+                            onChange={e => setNewChore({ ...newChore, title: e.target.value })}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-slate-400">Points Value</label>
+                          <input
+                            type="number"
+                            value={newChore.points}
+                            onChange={e => setNewChore({ ...newChore, points: e.target.value })}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500"
+                          />
+                          <p className="text-[10px] text-slate-500">Worth £{pointsToCash(parseInt(newChore.points) || 0)}</p>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-slate-400">Frequency</label>
+                          <select
+                            value={newChore.frequency}
+                            onChange={e => setNewChore({ ...newChore, frequency: e.target.value })}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500"
+                          >
+                            <option value="Daily">Daily</option>
+                            <option value="Weekly">Weekly</option>
+                            <option value="Bi-Weekly">Bi-Weekly</option>
+                            <option value="Monthly">Monthly</option>
+                            <option value="When Required">When Required</option>
+                            <option value="One-Time">One-Time</option>
+                          </select>
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="md:col-span-3 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs transition-all shadow-lg"
+                        >
+                          Add Point Chore
+                        </button>
+                      </form>
+                    </div>
+
+                    {/* MANAGE & DELETE EXISTING CHORES */}
+                    <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-6 space-y-4">
+                      <h2 className="text-lg font-bold text-slate-100">Manage & Delete Existing Chores</h2>
+                      <p className="text-xs text-slate-400">Click delete on any chore below to immediately remove it from the app</p>
+
+                      <div className="space-y-3">
+                        {chores.map(chore => (
+                          <div key={chore.id} className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                            <div>
+                              <div className="font-bold text-slate-200">{chore.title}</div>
+                              <div className="text-xs text-amber-400 font-semibold mt-0.5">
+                                {chore.points} Points • {chore.category} ({chore.frequency}) • Status: {chore.status}
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => handleDeleteChore(chore.id)}
+                              className="px-3 py-1.5 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-xs font-semibold hover:bg-rose-500/30 transition-all flex items-center gap-1"
+                            >
+                              <span>🗑️</span> Delete
+                            </button>
+                          </div>
+                        ))}
+                        {chores.length === 0 && (
+                          <p className="text-xs text-slate-500">No chores exist yet. Add one above!</p>
+                        )}
+                      </div>
+                    </div>
+
+{/* Flexible Points Management */}
+                    <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-6 space-y-4">
+                      <h2 className="text-lg font-bold text-slate-100">Manage & Redeem Points</h2>
+                      <p className="text-xs text-slate-400">Deduct spent points or manually set a new total balance for each child</p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {teens.map(teen => (
+                          <div key={teen.id} className="bg-slate-950/80 border border-slate-800 p-5 rounded-xl space-y-4">
+                            <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                              <div>
+                                <div className="font-bold text-slate-100 text-sm">{teen.avatar} {teen.name}</div>
+                                <div className="text-xs text-amber-400 font-semibold mt-0.5">
+                                  Current Balance: {teen.points} Points (£{pointsToCash(teen.points)})
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Option 1: Deduct points spent */}
+                            <div className="space-y-1.5">
+                              <label className="text-[11px] text-slate-400 font-medium">Deduct Spent Points (e.g. 20 for £10)</label>
+                              <div className="flex gap-2">
+                                <input
+                                  type="number"
+                                  id={`deduct-${teen.id}`}
+                                  placeholder="Points to deduct"
+                                  className="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                />
+                                <button
+                                  onClick={() => {
+                                    const inputElem = document.getElementById(`deduct-${teen.id}`);
+                                    handleDeductPoints(teen.id, inputElem.value);
+                                    inputElem.value = '';
+                                  }}
+                                  className="px-3 py-2 bg-amber-600/20 text-amber-400 border border-amber-500/30 rounded-lg text-xs font-semibold hover:bg-amber-600/30 transition-all whitespace-nowrap"
+                                >
+                                  Deduct
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Option 2: Set exact new total */}
+                            <div className="space-y-1.5 pt-2 border-t border-slate-900">
+                              <label className="text-[11px] text-slate-400 font-medium">Or Set Exact New Total Balance</label>
+                              <div className="flex gap-2">
+                                <input
+                                  type="number"
+                                  id={`set-${teen.id}`}
+                                  placeholder="New total points"
+                                  className="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                                />
+                                <button
+                                  onClick={() => {
+                                    const inputElem = document.getElementById(`set-${teen.id}`);
+                                    handleSetPoints(teen.id, inputElem.value);
+                                    inputElem.value = '';
+                                  }}
+                                  className="px-3 py-2 bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-semibold hover:bg-indigo-600/30 transition-all whitespace-nowrap"
+                                >
+                                  Set Total
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                )}
+              </div>
+            )}
+
+          </main>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
