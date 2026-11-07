@@ -316,7 +316,7 @@
                 <span className="text-base">💡</span>
                 <span className="font-medium	">Point Value Rate:</span>
                 <span className="font-bold text-white bg-indigo-900/80 px-2 py-0.5 rounded border border-indigo-700">20 Points = £10.00</span>
-                <span className="text-slate-400">(1 Point = £0.50)</span>
+                <span className="text-slate-400">(1 Point = £1.00)</span>
               </div>
               <div className="text-slate-300">
                 {activeTeen.name} currently has <span className="font-bold text-amber-400">{activeTeen.points} Points</span>
@@ -338,7 +338,7 @@
                   <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 p-5 rounded-2xl">
                     <div className="text-xs font-medium text-slate-400">Cash Value Equivalent</div>
                     <div className="text-3xl font-extrabold text-emerald-400 mt-2">£{pointsToCash(activeTeen.points)}</div>
-                    <div className="text-xs text-slate-500 mt-1">Based on 20 pts = £10</div>
+                    <div className="text-xs text-slate-500 mt-1">Based on 10 pts = £10</div>
                   </div>
 
                   <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 p-5 rounded-2xl">
@@ -563,16 +563,8 @@
                   <h3 className="font-bold text-base text-slate-200">Point Conversion Guide</h3>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-base">
                     <div className="bg-slate-900 p-3 rounded-lg border border-slate-800">
-                      <div className="text-slate-400">2 Points</div>
+                      <div className="text-slate-400">1 Point</div>
                       <div className="text-emerald-400 font-bold mt-1">£1.00</div>
-                    </div>
-                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-800">
-                      <div className="text-slate-400">10 Points</div>
-                      <div className="text-emerald-400 font-bold mt-1">£5.00</div>
-                    </div>
-                    <div className="bg-indigo-950 border border-indigo-800/60 p-3 rounded-lg">
-                      <div className="text-indigo-300 font-bold">20 Points</div>
-                      <div className="text-emerald-400 font-extrabold text-sm mt-1">£10.00</div>
                     </div>
                     <div className="bg-slate-900 p-3 rounded-lg border border-slate-800">
                       <div className="text-slate-400">2 Points</div>
